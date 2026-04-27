@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no">
+    <title>小方电影制片厂</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{
+            background:#ffffff !important;
+            color:#000000 !important;
+            font-family:微软雅黑;
+            padding:15px;
+        }
+        /* 弹窗遮罩 极浅 绝不变暗 */
+        .modal{
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,0.12) !important;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            z-index:99999;
+        }
+        .modal-content{
+            background:#fff !important;
+            border:2px solid #eee;
+            border-radius:10px;
+            width:92%;
+            max-width:480px;
+            padding:25px;
+            position:relative;
+        }
+        /* 按钮全部高亮可点击 */
+        .close-btn,.back-btn{
+            position:absolute;
+            border:none;
+            padding:6px 10px;
+            border-radius:4px;
+            background:#0066cc;
+            color:#fff;
+            font-size:14px;
+            cursor:pointer !important;
+            z-index:999999;
+        }
+        .close-btn{right:15px;top:12px;}
+        .back-btn{left:15px;top:12px;}
+
+        .btn{
+            width:100%;
+            background:#007bff;
+            color:#fff;
+            border:none;
+            padding:11px;
+            font-size:16px;
+            border-radius:6px;
+            margin:8px 0;
+            cursor:pointer !important;
+        }
+        h2,h3{color:#111;margin:10px 0;}
+        p{color:#222;line-height:1.7;margin:8px 0;}
+        input{
+            width:100%;
+            padding:10px;
+            margin:6px 0 15px;
+            border:1px solid #ccc;
+            border-radius:4px;
+            font-size:15px;
+        }
+        .form-footer{text-align:center;margin-top:10px;}
+        .form-footer a{color:#0066cc;text-decoration:none;}
+
+        #mainPage{display:none;}
+        .main-title{
+            text-align:center;
+            font-size:22px;
+            font-weight:bold;
+            margin:20px 0;
+        }
+        .main-desc{
+            background:#f8f8f8;
+            padding:18px;
+            border-radius:8px;
+            margin-bottom:25px;
+        }
+        .douyin-btn{
+            display:block;
+            width:fit-content;
+            margin:0 auto 35px;
+            background:#fe2c55;
+            color:#fff;
+            text-decoration:none;
+            padding:10px 22px;
+            border-radius:6px;
+        }
+        .aircraft-title{
+            text-align:center;
+            font-size:18px;
+            margin:20px 0;
+        }
+        .aircraft-section{display:flex;gap:15px;justify-content:center;margin:30px 0;}
+        .aircraft-card{
+            background:#f8f8f8;
+            border:1px solid #eee;
+            width:45%;
+            text-align:center;
+            padding:25px 10px;
+            border-radius:8px;
+            cursor:pointer !important;
+        }
+        .feedback-btn{
+            text-align:center;
+            display:block;
+            color:#555;
+            margin:20px 0;
+            text-decoration:none;
+        }
+
+        /* 飞机弹窗 白色正常 */
+        .aircraft-modal{max-width:950px;height:82vh;}
+        .modal-container{display:flex;height:100%;}
+        .aircraft-nav{
+            width:140px;
+            background:#f5f5f5;
+            padding:15px 5px;
+        }
+        .aircraft-nav button{
+            width:100%;
+            border:none;
+            background:transparent;
+            padding:7px;
+            margin:3px 0;
+            text-align:left;
+            cursor:pointer !important;
+        }
+        .aircraft-content{
+            flex:1;
+            padding:20px;
+            overflow:auto;
+        }
+        .model-item{margin-bottom:25px;border-bottom:1px solid #eee;padding-bottom:15px;}
+
+        /* 强制弹窗默认隐藏 */
+        #loginModal,#registerModal,#boeingModal,#airbusModal{display:none;}
+    </style>
+</head>
+<body>
+
+<!-- 欢迎弹窗 -->
+<div class="modal" id="welcomeModal">
+    <div class="modal-content">
+        <button class="close-btn" onclick="closeWelcomeModal()">我知道了</button>
+        <h2>欢迎来到小方电影制片厂</h2>
+        <p>欢迎进入官方主页，这里集合航空资料、原创视频、飞机百科内容。</p>
+        <button class="btn" onclick="showLoginModal()">立即登录</button>
+    </div>
+</div>
+
+<!-- 登录 -->
+<div class="modal" id="loginModal">
+    <div class="modal-content">
+        <button class="back-btn" onclick="backToWelcome()">返回</button>
+        <h2>用户登录</h2>
+        <label>邮箱</label>
+        <input type="text" id="loginEmail">
+        <label>用户名</label>
+        <input type="text" id="loginUser">
+        <label>密码</label>
+        <input type="text" id="loginPwd">
+        <button class="btn" onclick="loginOk()">登录完成</button>
+        <div class="form-footer">没有账号？<a href="javascript:regShow()">立即注册</a></div>
+    </div>
+</div>
+
+<!-- 注册 -->
+<div class="modal" id="registerModal">
+    <div class="modal-content">
+        <button class="back-btn" onclick="loginShow()">返回</button>
+        <h2>账号注册</h2>
+        <label>邮箱</label>
+        <input type="text" id="regEmail">
+        <label>用户名</label>
+        <input type="text" id="regUser">
+        <label>密码</label>
+        <input type="text" id="regPwd">
+        <button class="btn" onclick="regOk()">完成注册</button>
+    </div>
+</div>
+
+<!-- 主页面 -->
+<div id="mainPage">
+    <h2 class="main-title">欢迎来到小方电影制片厂官方账号</h2>
+    <div class="main-desc">
+        小方电影制片厂主打原创校园短剧创作，涵盖校园搞笑、校园逃脱、趣味日常等多元短视频内容，同时兼顾航空文化科普与民航全机型资料整理。我们以创意拍摄为核心，用心制作轻松有趣的校园作品，也为航空爱好者提供完整的波音、空客客机资料库，用热爱记录生活、分享趣味与蓝天魅力。
+    </div>
+    <a href="https://www.douyin.com" target="_blank" class="douyin-btn">一键跳转至抖音网页版</a>
+
+    <h3 class="aircraft-title">飞机专区</h3>
+    <div class="aircraft-section">
+        <div class="aircraft-card" onclick="boeingShow()">
+            <h3>波音公司</h3>
+            <p>全系客机完整资料库</p>
+        </div>
+        <div class="aircraft-card" onclick="airbusShow()">
+            <h3>空客公司</h3>
+            <p>全系客机完整资料库</p>
+        </div>
+    </div>
+
+    <a href="#" class="feedback-btn">向我们提意见</a>
+</div>
+
+<!-- 波音弹窗 -->
+<div class="modal" id="boeingModal">
+    <div class="modal-content aircraft-modal">
+        <button class="close-btn" onclick="boeingClose()">关闭</button>
+        <div class="modal-container">
+            <div class="aircraft-nav">
+                <button onclick="goTo('b707')">波音707</button>
+                <button onclick="goTo('b717')">波音717</button>
+                <button onclick="goTo('b727')">波音727</button>
+                <button onclick="goTo('b737')">波音737</button>
+                <button onclick="goTo('b747')">波音747</button>
+                <button onclick="goTo('b757')">波音757</button>
+                <button onclick="goTo('b767')">波音767</button>
+                <button onclick="goTo('b777')">波音777</button>
+                <button onclick="goTo('b787')">波音787</button>
+            </div>
+            <div class="aircraft-content">
+                <div class="model-item"><h3>波音公司简介</h3><p>波音公司是全球顶尖航空制造企业，总部位于美国，深耕民用客机、军用飞机、航天设备领域百年之久，是民航喷气时代的开创者，机型覆盖短途、中程、远程宽体全品类。</p></div>
+                <div id="b707" class="model-item"><h3>波音707</h3><p>全球第一代商业化喷气客机，正式开启民航喷气旅行时代。</p></div>
+                <div id="b717" class="model-item"><h3>波音717</h3><p>短途支线窄体客机，机身小巧，适合短途小众航线。</p></div>
+                <div id="b727" class="model-item"><h3>波音727</h3><p>经典尾部三发布局，曾经全球销量极高的经典机型。</p></div>
+                <div id="b737" class="model-item"><h3>波音737</h3><p>全球产量最高、使用最广泛的窄体客机，覆盖全球绝大多数民航航线。</p></div>
+                <div id="b747" class="model-item"><h3>波音747</h3><p>俗称空中女王，独特驼峰机头，经典四发远程宽体客机。</p></div>
+                <div id="b757" class="model-item"><h3>波音757</h3><p>高性能窄体机，擅长高原、高热机场起降，续航能力强劲。</p></div>
+                <div id="b767" class="model-item"><h3>波音767</h3><p>双发经典宽体机，长期执飞中远程国际航线。</p></div>
+                <div id="b777" class="model-item"><h3>波音777</h3><p>世界最大双发宽体客机，稳定性强，是洲际航线主力机型。</p></div>
+                <div id="b787" class="model-item"><h3>波音787</h3><p>梦想客机，大量复合材料打造，更省油、客舱舒适度大幅提升。</p></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 空客弹窗 -->
+<div class="modal" id="airbusModal">
+    <div class="modal-content aircraft-modal">
+        <button class="close-btn" onclick="airbusClose()">关闭</button>
+        <div class="modal-container">
+            <div class="aircraft-nav">
+                <button onclick="goAir('a300')">空客A300</button>
+                <button onclick="goAir('a310')">空客A310</button>
+                <button onclick="goAir('a320')">A320系列</button>
+                <button onclick="goAir('a330')">空客A330</button>
+                <button onclick="goAir('a340')">空客A340</button>
+                <button onclick="goAir('a350')">空客A350</button>
+                <button onclick="goAir('a380')">空客A380</button>
+            </div>
+            <div class="aircraft-content">
+                <div class="model-item"><h3>空客公司简介</h3><p>空中客车公司是欧洲顶级航空制造集团，与波音并列全球两大民航客机制造商，以电传飞控、现代化设计、高性价比为特色，机型覆盖全层级民航市场。</p></div>
+                <div id="a300" class="model-item"><h3>空客A300</h3><p>空客首款双发宽体客机，拉开空客全球化竞争序幕。</p></div>
+                <div id="a310" class="model-item"><h3>空客A310</h3><p>A300缩短改版，航程更远，适配中远程航线。</p></div>
+                <div id="a320" class="model-item"><h3>空客A320系列</h3><p>全球首款电传飞控民用客机，包含A319/A320/A321等主流机型。</p></div>
+                <div id="a330" class="model-item"><h3>空客A330</h3><p>成熟耐用双发宽体机，性价比高，全球航司广泛使用。</p></div>
+                <div id="a340" class="model-item"><h3>空客A340</h3><p>经典四发远程客机，超长航程，适合早期跨洋航线。</p></div>
+                <div id="a350" class="model-item"><h3>空客A350</h3><p>新一代远程宽体机，轻量化设计，省油环保，现代洲际主力。</p></div>
+                <div id="a380" class="model-item"><h3>空客A380</h3><p>全球最大双层超大型客机，空中巨无霸，载客量顶尖。</p></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// 我知道了 直接进入主界面
+function closeWelcomeModal(){
+    document.getElementById("welcomeModal").style.display="none";
+    document.getElementById("mainPage").style.display="block";
+}
+function showLoginModal(){document.getElementById("welcomeModal").style.display="none";document.getElementById("loginModal").style.display="flex";}
+function backToWelcome(){document.getElementById("loginModal").style.display="none";document.getElementById("welcomeModal").style.display="flex";}
+
+// 登录注册切换
+function regShow(){document.getElementById("loginModal").style.display="none";document.getElementById("registerModal").style.display="flex";}
+function loginShow(){document.getElementById("registerModal").style.display="none";document.getElementById("loginModal").style.display="flex";}
+
+// 登录进入主页
+function loginOk(){
+    document.getElementById("loginModal").style.display="none";
+    document.getElementById("mainPage").style.display="block";
+}
+// 注册进入主页
+function regOk(){
+    document.getElementById("registerModal").style.display="none";
+    document.getElementById("mainPage").style.display="block";
+}
+
+// 波音
+function boeingShow(){document.getElementById("boeingModal").style.display="flex";}
+function boeingClose(){document.getElementById("boeingModal").style.display="none";}
+function goTo(id){document.getElementById(id).scrollIntoView({behavior:"smooth"});}
+
+// 空客
+function airbusShow(){document.getElementById("airbusModal").style.display="flex";}
+function airbusClose(){document.getElementById("airbusModal").style.display="none";}
+function goAir(id){document.getElementById(id).scrollIntoView({behavior:"smooth"});}
+</script>
+
+</body>
+</html>
